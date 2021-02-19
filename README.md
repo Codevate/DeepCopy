@@ -7,7 +7,6 @@ DeepCopy helps you create deep copies (clones) of your objects. It is designed t
 [![Scrutinizer Quality Score](https://scrutinizer-ci.com/g/myclabs/DeepCopy/badges/quality-score.png?s=2747100c19b275f93a777e3297c6c12d1b68b934)](https://scrutinizer-ci.com/g/myclabs/DeepCopy/)
 [![Total Downloads](https://poser.pugx.org/myclabs/deep-copy/downloads.svg)](https://packagist.org/packages/myclabs/deep-copy)
 
-
 ## Table of Contents
 
 1. [Installation](#installation)
@@ -388,6 +387,9 @@ Running the tests is simple:
 vendor/bin/phpunit
 ```
 
+### Support
+
+Get professional support via [the Tidelift Subscription](https://tidelift.com/subscription/pkg/packagist-myclabs-deep-copy?utm_source=packagist-myclabs-deep-copy&utm_medium=referral&utm_campaign=readme).
 
 [chainable filter]: src/DeepCopy/Filter/ChainableFilter.php
 [clone]: https://secure.php.net/manual/en/language.oop5.cloning.php#object.clone
