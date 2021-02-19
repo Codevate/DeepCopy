@@ -18,9 +18,13 @@ use DeepCopy\f006;
 use DeepCopy\f007;
 use DeepCopy\f008;
 use DeepCopy\f009;
+use DeepCopy\f010;
 use DeepCopy\f011;
+use DeepCopy\Filter\Doctrine\DoctrineProxyFilter;
 use DeepCopy\Filter\KeepFilter;
+use DeepCopy\Filter\ReplaceFilter;
 use DeepCopy\Filter\SetNullFilter;
+use DeepCopy\Matcher\Doctrine\DoctrineProxyMatcher;
 use DeepCopy\Matcher\PropertyNameMatcher;
 use DeepCopy\Matcher\PropertyTypeMatcher;
 use DeepCopy\TypeFilter\ShallowCopyFilter;
@@ -456,13 +460,47 @@ class DeepCopyTest extends TestCase
         $this->assertNull($copy->getFoo());
     }
 
+    public function test_private_property_of_parent_object_copy_with_filters_and_matchers()
+    {
+        $object = new f001\B();
+        $object->setAProp(new stdClass());
+        $object->setBProp(new stdClass());
+
+        $deepCopy = new DeepCopy();
+        $deepCopy->addFilter(new ReplaceFilter(function() {return 'foo';}), new PropertyTypeMatcher(stdClass::class));
+
+        $new = $deepCopy->copy($object);
+
+        $this->assertSame('foo', $new->getAProp());
+        $this->assertSame('foo', $new->getBProp());
+    }
+
+    /**
+     * @ticket https://github.com/myclabs/DeepCopy/issues/98
+     */
+    public function test_it_can_apply_two_filters()
+    {
+        $object = new f009\A();
+
+        $deepCopy = new DeepCopy();
+        $deepCopy->addFilter(new DoctrineProxyFilter(), new DoctrineProxyMatcher());
+        $deepCopy->addFilter(new SetNullFilter(), new PropertyNameMatcher('foo'));
+
+        $copy = $deepCopy->copy($object);
+
+        $this->assertNull($copy->foo);
+    }
+
     public function test_it_can_prepend_filter()
     {
         $object = new f008\A('bar');
+
         $deepCopy = new DeepCopy();
         $deepCopy->addFilter(new KeepFilter(), new PropertyNameMatcher('foo'));
         $deepCopy->prependFilter(new SetNullFilter(), new PropertyNameMatcher('foo'));
+
         $copy = $deepCopy->copy($object);
+
         $this->assertNull($copy->getFoo());
     }
 
@@ -499,5 +537,19 @@ class DeepCopyTest extends TestCase
     {
         $this->assertEquals($expected, $val);
         $this->assertNotSame($expected, $val);
+    }
+
+    public function test_it_can_copy_property_after_applying_doctrine_proxy_filter()
+    {
+        $object = new f010\A();
+        $object->setFoo(new f010\B());
+
+        $deepCopy = new DeepCopy();
+        $deepCopy->addFilter(new DoctrineProxyFilter(), new DoctrineProxyMatcher());
+
+        /** @var f010\A $copy */
+        $copy = $deepCopy->copy($object);
+
+        $this->assertNotEquals($copy->getFoo(), $object->getFoo());
     }
 }
